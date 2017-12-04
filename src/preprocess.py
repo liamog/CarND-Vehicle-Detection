@@ -1,11 +1,21 @@
-import cv2
+'''Preprocess '''
 import numpy as np
-import config
-
+import scipy.misc
 from skimage.feature import hog
+
+import config
+import cv2
 
 
 def extract_hog_features(img):
+    """
+    Extract a set of hog features for the img.
+        :param img:
+    """
+    shape = np.shape(img)
+    assert len(shape) == 2
+    #Only support extracting features for images px 64 high
+    assert shape[0] == 64
     return hog(img,
                orientations=9,
                pixels_per_cell=(8, 8),
@@ -13,9 +23,15 @@ def extract_hog_features(img):
                visualise=False,
                block_norm='L2-Hys')
 
-
+#pylint ignore-too-many-return
 def select_channel(img_rgb, channel):
-    #pylint ignore-too-many-return
+    """
+    Returns the selected color sub channel from an RGB input image.
+    First converts the colorspace if necessary, and then returns the
+    requested channel
+        :param img_rgb:
+        :param channel: string describing the colorspace_channel e.g. hls_s
+    """
     if channel == "rgb_r":
         return img_rgb[:, :, 0]
     if channel == "rgb_g":
@@ -51,6 +67,11 @@ def select_channel(img_rgb, channel):
         return img_luv[:, :, 2]
 
 def extract_regions_of_interest(img):
+    """
+    Extracts a set of regions of interest for the image and scale them
+    to 64px high.
+        :param img:
+    """
     shape = np.shape(img)
     # make sure we have the expected size and that it is a single channel
     assert len(shape) == 2
@@ -68,17 +89,6 @@ def extract_regions_of_interest(img):
     col_near_start = config.NEAR_SEARCH_REGION[0][0]
     col_near_end = config.NEAR_SEARCH_REGION[1][0]
 
-    # cv2.rectangle(img,
-    #             (col_near_start, row_near_start),
-    #             (col_near_end, row_near_end),
-    #             [255, 0, 0], 3)
-
-    # cv2.rectangle(img,
-    #             (col_far_start, row_far_start),
-    #             (col_far_end, row_far_end),
-    #             [0, 0, 255], 3)
-
-
     row_start = row_near_start
     row_end = row_near_end
     col_start = col_near_start
@@ -89,17 +99,19 @@ def extract_regions_of_interest(img):
     col_start_step = int((col_near_start - col_far_start) / config.SCALE_SAMPLES)
     col_end_step = int((col_near_end - col_far_end) / config.SCALE_SAMPLES)
 
-# # for file in glob.glob('test_images/test4.jpg'):
-# print("row_start_step={}, row_end_step={}, col_start_step={}, col_end_step={}".format(
-#     row_start_step, row_end_step, col_start_step, col_end_step))
     regions = []
 
-    for ii in range(config.SCALE_SAMPLES):
-        # print("r({}-{}), c({}-{})".format(row_start, row_end, col_start, col_end))
-        regions.append(img[row_start:row_end, col_start:col_end, ])
+    #pylint: disable=unused-variable
+    for sub_image_index in range(config.SCALE_SAMPLES):
 
-        # cv2.rectangle(img, (col_start, row_start),
-        #             (col_end, row_end), [0, 255, 0], 3)
+        sub_img = img[row_start:row_end, col_start:col_end, ]
+        # Now resize this image to be 64px high and scale appropriately.
+        sub_image_shape = np.shape(sub_img)
+        scaler = 64 / sub_image_shape[0]
+        resize_shape = (64, int(sub_image_shape[1] * scaler))
+        resized_subimage = scipy.misc.imresize(sub_img, resize_shape)
+        regions.append(resized_subimage)
+
         col_start -= col_start_step
         col_end -= col_end_step
         row_start -= row_start_step
