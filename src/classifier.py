@@ -77,8 +77,8 @@ class Classifier():
             x_nonvehicles.append(features)
             y_nonvehicles.append(0)
 
-        assert len(x_vehicles) > 0
-        assert len(x_nonvehicles) > 0
+        assert x_vehicles
+        assert x_nonvehicles
 
         x_unscaled = np.concatenate((x_vehicles, x_nonvehicles))
         y_full = np.concatenate((y_vehicles, y_nonvehicles))
