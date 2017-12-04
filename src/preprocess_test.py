@@ -23,7 +23,7 @@ class TestPreprocess(unittest.TestCase):
         # just test with one channel
         regions = pp.extract_regions_of_interest(img[:, :, 0])
         self.assertTrue(len(regions) == config.SCALE_SAMPLES)
-        for image in regions:
+        for scaler, bounds, image in regions:
             self.assertEqual(np.shape(image)[0], 64)
 
 if __name__ == '__main__':

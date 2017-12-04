@@ -7,7 +7,7 @@ import config
 import cv2
 
 
-def extract_hog_features(img):
+def extract_hog_features(img, feature_vector=True):
     """
     Extract a set of hog features for the img.
         :param img:
@@ -21,6 +21,7 @@ def extract_hog_features(img):
                pixels_per_cell=(8, 8),
                cells_per_block=(3, 3),
                visualise=False,
+               feature_vector=feature_vector,
                block_norm='L2-Hys')
 
 #pylint ignore-too-many-return
@@ -103,14 +104,14 @@ def extract_regions_of_interest(img):
 
     #pylint: disable=unused-variable
     for sub_image_index in range(config.SCALE_SAMPLES):
-
+        sub_img_bounds = ((col_start,row_start), (col_end, row_end))
         sub_img = img[row_start:row_end, col_start:col_end, ]
         # Now resize this image to be 64px high and scale appropriately.
         sub_image_shape = np.shape(sub_img)
         scaler = 64 / sub_image_shape[0]
         resize_shape = (64, int(sub_image_shape[1] * scaler))
         resized_subimage = scipy.misc.imresize(sub_img, resize_shape)
-        regions.append(resized_subimage)
+        regions.append((1.0/scaler, sub_img_bounds, resized_subimage))
 
         col_start -= col_start_step
         col_end -= col_end_step
