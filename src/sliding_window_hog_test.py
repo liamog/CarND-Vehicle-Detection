@@ -27,8 +27,8 @@ class TestSlidingWindow(unittest.TestCase):
 
         # just test with one channel
         sliding_window = SlidingWindowHog()
-        sliding_window.ProcessImage(img)
-        for sub_image in sliding_window.images:
+        sliding_window.process_image(img)
+        for start_col, sub_image in sliding_window.images:
             self.assertEqual(np.shape(sub_image), dummy_shape)
 
 if __name__ == '__main__':

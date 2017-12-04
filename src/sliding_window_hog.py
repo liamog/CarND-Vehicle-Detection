@@ -14,7 +14,7 @@ class SlidingWindowHog():
         self.hog_samples = None
         self.horizontal_block_step = horizontal_block_step
 
-    def ProcessImage(self, img):
+    def process_image(self, img):
         '''Returns the set of feature vectors to classify from this subimage'''
         # process the hog image as a set of feature blocks that we will
         # subsample
@@ -32,6 +32,6 @@ class SlidingWindowHog():
 
         start_col = 0
         while (shape[1] - start_col >= window_width):
-            self.images.append(
-                self.hog_samples[:, start_col:start_col + window_width, :, :, ])
+            hog_samples = self.hog_samples[:, start_col:start_col + window_width, :, :, ]
+            self.images.append((start_col, hog_samples))
             start_col += self.horizontal_block_step
