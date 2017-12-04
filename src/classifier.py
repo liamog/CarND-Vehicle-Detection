@@ -1,5 +1,6 @@
 '''Vehicle classifier module'''
 import os
+import pathlib
 import tempfile
 
 import numpy as np
@@ -13,6 +14,7 @@ import config
 import cv2
 import preprocess as pp
 
+
 #pylint ignore-too-few-public-methods
 class Classifier():
     """
@@ -24,14 +26,23 @@ class Classifier():
         if self._unit_test:
             with tempfile.NamedTemporaryFile() as temp:
                 self._trained_model_filename = temp.name
+            with tempfile.NamedTemporaryFile() as temp:
+                self._trained_model_scaler_filename = temp.name
         else:
-            self._trained_model_filename = "../cached/trained_model.p"
+            self._trained_model_filename = "cached/trained_model.p"
+            self._trained_model_scaler_filename = "cached/trained_model_scaler.p"
+            pathlib.Path("cached").mkdir(parents=True, exist_ok=True)
 
         self.clf = None
+        self.x_scaler = None
 
         if os.path.isfile(self._trained_model_filename):
             self.clf = joblib.load(self._trained_model_filename)
-        if self.clf is None:
+
+        if os.path.isfile(self._trained_model_scaler_filename):
+            self.x_scaler = joblib.load(self._trained_model_scaler_filename)
+
+        if self.clf is None or self.x_scaler is None:
             self._train()
 
     def _train(self):
@@ -87,20 +98,21 @@ class Classifier():
 
         x_full = np.vstack(x_unscaled).astype(np.float64)
 
-        x_scaler = StandardScaler().fit(x_full)
-        scaled_x = x_scaler.transform(x_full)
+        self.x_scaler = StandardScaler().fit(x_full)
+        scaled_x = self.x_scaler.transform(x_full)
 
         x_train, x_test, y_train, y_test = train_test_split(
             scaled_x, y_full, test_size=0.33, random_state=42)
 
-        clf = svm.SVC(C=10.0, kernel='rbf', gamma=0.001, verbose=True)
-        clf.fit(x_train, y_train)
+        self.clf = svm.SVC(C=10.0, kernel='rbf', gamma=0.001, verbose=True)
+        self.clf.fit(x_train, y_train)
 
-        y_predict = clf.predict(x_test)
+        y_predict = self.clf.predict(x_test)
 
         self.accuracy = accuracy_score(y_test, y_predict)
 
-        joblib.dump(clf, self._trained_model_filename)
+        joblib.dump(self.clf, self._trained_model_filename)
+        joblib.dump(self.x_scaler, self._trained_model_scaler_filename)
 
     def predict(self, features):
         """
@@ -108,4 +120,5 @@ class Classifier():
             :param self:
             :param features:
         """
-        return self.clf.predict(features)
+        scaled_features = self.x_scaler.transform(features.reshape(1, -1))
+        return self.clf.predict(scaled_features)
