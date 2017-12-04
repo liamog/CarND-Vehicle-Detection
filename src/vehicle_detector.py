@@ -32,6 +32,12 @@ class VehicleDetector():
                     scaled_x = col_start * \
                         config.HOG_PIXELS_PER_CELL[0]
                     orig_x = scaled_x * scaler
+
+                    start_x = int(orig_x)
+                    end_x = start_x + int(64 * scaler)
+                    start_y = bounds[0][1]
+                    end_y = bounds[1][1]
+
                     print("found vehicle - block start = {}, scaled_px={}, orig_px={}, bounds={}".format(
                         col_start,
                         scaled_x,
@@ -39,6 +45,10 @@ class VehicleDetector():
                         bounds
                         ))
                     # TODO Draw the bounding box on the image.
+                    cv2.rectangle(img,
+                                  (start_x, start_y),
+                                  (end_x , end_y),
+                                  [0,255,0], 3)
 
         return img
 
