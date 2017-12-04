@@ -1,4 +1,6 @@
+'''Vehicle classifier module'''
 import os
+import tempfile
 
 import numpy as np
 from sklearn import svm
@@ -7,15 +9,15 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-import cv2
 import config
-import tempfile
-
+import cv2
 import preprocess as pp
 
-
+#pylint ignore-too-few-public-methods
 class Classifier():
-
+    """
+    Classifier class.
+    """
     def __init__(self, unit_test=False):
         self._unit_test = unit_test
 
@@ -101,4 +103,9 @@ class Classifier():
         joblib.dump(clf, self._trained_model_filename)
 
     def predict(self, features):
+        """
+        Predict if a vehicle is present in the set of features
+            :param self:
+            :param features:
+        """
         return self.clf.predict(features)
