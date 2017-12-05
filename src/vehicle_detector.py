@@ -23,11 +23,10 @@ class VehicleDetector():
         shape = np.shape(img)
         assert shape[0] == 720
         assert shape[1] == 1280
-        selected_channel = pp.select_channel(img, config.HOG_COLOR_CHANNEL)
-        for scaler, bounds, scaled_region in pp.extract_regions_of_interest(selected_channel):
+        for scaler, bounds, scaled_region in pp.extract_regions_of_interest(img):
             sliding_window_hog = SlidingWindowHog()
             sliding_window_hog.process_image(scaled_region)
-            for col_start, sub_features in sliding_window_hog.images:
+            for col_start, sub_features in sliding_window_hog.feature_windows:
                 if self.classifier.predict(sub_features.ravel()) == 1:
                     scaled_x = col_start * \
                         config.HOG_PIXELS_PER_CELL[0]

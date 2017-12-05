@@ -20,7 +20,7 @@ class TestVehicleDetector(unittest.TestCase):
             :param self:
         """
         img = mpimg.imread('test_images/test1.jpg')
-
+        self.assertIsNotNone(img)
         # just test with one channel
         vehicle_detector = VehicleDetector()
         vehicle_detector.process_image(img)

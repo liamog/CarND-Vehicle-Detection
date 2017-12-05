@@ -19,16 +19,16 @@ class TestSlidingWindow(unittest.TestCase):
         Test extracting scaled regions from the image.
             :param self:
         """
-        dummy = np.zeros((64,64))
-        dummy_hog = pp.extract_hog_features(dummy, feature_vector=False)
+        dummy = np.zeros((64, 64, 3), np.uint8)
+        img_for_hog = pp.convert_img_for_hog(dummy)
+        dummy_hog = pp.extract_hog_features(img_for_hog)
         dummy_shape = np.shape(dummy_hog)
 
-        img = np.zeros((64, 1280))
-
+        img = np.zeros((64, 1280, 3), np.uint8)
         # just test with one channel
         sliding_window = SlidingWindowHog()
         sliding_window.process_image(img)
-        for start_col, sub_image in sliding_window.images:
+        for start_col, sub_image in sliding_window.feature_windows:
             self.assertEqual(np.shape(sub_image), dummy_shape)
 
 if __name__ == '__main__':

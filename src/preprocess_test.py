@@ -20,11 +20,30 @@ class TestPreprocess(unittest.TestCase):
         """
         img = mpimg.imread('test_images/test1.jpg')
         assert img is not None
-        # just test with one channel
-        regions = pp.extract_regions_of_interest(img[:, :, 0])
+        regions = pp.extract_regions_of_interest(img)
         self.assertTrue(len(regions) == config.SCALE_SAMPLES)
         for scaler, bounds, image in regions:
             self.assertEqual(np.shape(image)[0], 64)
+
+    def test_hog_single_channel(self):
+        """
+        Test getting a hog layer from a single channel image.
+            :param self:
+        """
+        dummy = np.zeros((64, 64, 1))
+
+        hog = pp.extract_hog_features(dummy)
+        self.assertGreater(len(hog), 2000)
+
+    def test_hog_multi_channel(self):
+        """
+        Test getting a hog layer from a single channel image.
+            :param self:
+        """
+        dummy = np.zeros((64, 64, 2))
+
+        hog = pp.extract_hog_features(dummy)
+        self.assertGreater(len(hog), 4000)
 
 if __name__ == '__main__':
     unittest.main()

@@ -47,7 +47,7 @@ class Classifier():
 
     def _train(self):
         self.clf = svm.SVC(C=10.0, kernel='rbf', gamma=0.001)
-        # The arg argument for walk, and subsequently ext for step
+
         exten = '.png'
         vehicle_files = []
         nonvehicle_files = []
@@ -76,18 +76,12 @@ class Classifier():
 
         for filename in vehicle_files:
             img_rgb = cv2.imread(filename)
-
-            channel = pp.select_channel(img_rgb, config.HOG_COLOR_CHANNEL)
-            features = pp.extract_hog_features(channel)
-            x_vehicles.append(features)
+            x_vehicles.append(self._extract_img_features(img_rgb))
             y_vehicles.append(1)
 
         for filename in nonvehicle_files:
             img_rgb = cv2.imread(filename)
-
-            channel = pp.select_channel(img_rgb, config.HOG_COLOR_CHANNEL)
-            features = pp.extract_hog_features(channel)
-            x_nonvehicles.append(features)
+            x_nonvehicles.append(self._extract_img_features(img_rgb))
             y_nonvehicles.append(0)
 
         assert x_vehicles
@@ -122,3 +116,7 @@ class Classifier():
         """
         scaled_features = self.x_scaler.transform(features.reshape(1, -1))
         return self.clf.predict(scaled_features)
+
+    def _extract_img_features(self, img):
+        img_for_hog = pp.convert_img_for_hog(img)
+        return pp.extract_hog_features(img_for_hog)

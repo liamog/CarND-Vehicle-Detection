@@ -6,6 +6,12 @@ from skimage.feature import hog
 import config
 import cv2
 
+def convert_img_for_hog(img_rgb):
+    channel1 = select_channel(img_rgb, 'hls_s')
+    channel1 = channel1 / 255
+    channel2 = select_channel(img_rgb, 'yuv_y')
+    channel2 = channel2 / 255
+    return np.dstack((channel1, channel2))
 
 def extract_hog_features(img, feature_vector=True):
     """
@@ -13,16 +19,42 @@ def extract_hog_features(img, feature_vector=True):
         :param img:
     """
     shape = np.shape(img)
-    assert len(shape) == 2
-    #Only support extracting features for images px 64 high
+    #Only support extracting features for images px 64 high but any width
+    #For single channel images use a 64xNx1 array.
+    #For multiple channel images use a 64xNxM array.
+    assert len(shape) == 3
     assert shape[0] == 64
-    return hog(img,
-               orientations=9,
-               pixels_per_cell=(8, 8),
-               cells_per_block=(3, 3),
-               visualise=False,
-               feature_vector=feature_vector,
-               block_norm='L2-Hys')
+    hogs = []
+    for ii in range(shape[2]):
+        hogs.append(hog(img[:, :, ii],
+                orientations=config.HOG_ORIENTATIONS,
+                pixels_per_cell=config.HOG_PIXELS_PER_CELL,
+                cells_per_block=config.HOG_CELLS_PER_BLOCK,
+                visualise=False,
+                feature_vector=False,
+                block_norm='L2-Hys'))
+
+    if feature_vector:
+        return np.ravel(hogs)
+
+    return hogs
+
+def bin_spatial(img, size=(32, 32)):
+    color1 = cv2.resize(img[:, :, 0], size).ravel()
+    color2 = cv2.resize(img[:, :, 1], size).ravel()
+    color3 = cv2.resize(img[:, :, 2], size).ravel()
+    return np.hstack((color1, color2, color3))
+
+def color_hist(img, nbins=32):  # bins_range=(0, 256)
+    # Compute the histogram of the color channels separately
+    channel1_hist = np.histogram(img[:, :, 0], bins=nbins)
+    channel2_hist = np.histogram(img[:, :, 1], bins=nbins)
+    channel3_hist = np.histogram(img[:, :, 2], bins=nbins)
+    # Concatenate the histograms into a single feature vector
+    hist_features = np.concatenate(
+        (channel1_hist[0], channel2_hist[0], channel3_hist[0]))
+    # Return the individual histograms, bin_centers and feature vector
+    return hist_features
 
 #pylint ignore-too-many-return
 def select_channel(img_rgb, channel):
@@ -66,6 +98,15 @@ def select_channel(img_rgb, channel):
     if channel == "luv_v":
         img_luv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Luv)
         return img_luv[:, :, 2]
+    if channel == "ycrcb_y":
+        img_ycrcb = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YCrCb)
+        return img_ycrcb[:, :, 0]
+    if channel == "ycrcb_cr":
+        img_ycrcb = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YCrCb)
+        return img_ycrcb[:, :, 1]
+    if channel == "ycrcb_cb":
+        img_ycrcb = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YCrCb)
+        return img_ycrcb[:, :, 2]
 
 def extract_regions_of_interest(img):
     """
@@ -74,9 +115,8 @@ def extract_regions_of_interest(img):
         :param img:
     """
     shape = np.shape(img)
-    # make sure we have the expected size and that it is a single channel
-    assert len(shape) == 2
-    print(shape)
+    # make sure we have the expected size.
+    assert len(shape) == 3
     assert shape[0] == 720
     assert shape[1] == 1280
 
@@ -105,11 +145,11 @@ def extract_regions_of_interest(img):
     #pylint: disable=unused-variable
     for sub_image_index in range(config.SCALE_SAMPLES):
         sub_img_bounds = ((col_start,row_start), (col_end, row_end))
-        sub_img = img[row_start:row_end, col_start:col_end, ]
+        sub_img = img[row_start:row_end, col_start:col_end, :]
         # Now resize this image to be 64px high and scale appropriately.
         sub_image_shape = np.shape(sub_img)
         scaler = 64 / sub_image_shape[0]
-        resize_shape = (64, int(sub_image_shape[1] * scaler))
+        resize_shape = (64, int(sub_image_shape[1] * scaler), shape[2])
         resized_subimage = scipy.misc.imresize(sub_img, resize_shape)
         regions.append((1.0/scaler, sub_img_bounds, resized_subimage))
 
@@ -118,3 +158,4 @@ def extract_regions_of_interest(img):
         row_start -= row_start_step
         row_end -= row_end_step
     return regions
+

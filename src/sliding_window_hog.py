@@ -6,32 +6,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 import cv2
+import preprocess as pp
 
 class SlidingWindowHog():
 
     def __init__(self, horizontal_block_step = 2):
-        self.images = []
-        self.hog_samples = None
+        self.feature_windows = []
+
         self.horizontal_block_step = horizontal_block_step
 
     def process_image(self, img):
         '''Returns the set of feature vectors to classify from this subimage'''
-        # process the hog image as a set of feature blocks that we will
-        # subsample
-        self.hog_samples = hog(img,
-                               orientations=config.HOG_ORIENTATIONS,
-                               pixels_per_cell=config.HOG_PIXELS_PER_CELL,
-                               cells_per_block=config.HOG_CELLS_PER_BLOCK,
-                               block_norm=config.HOG_BLOCK_NORM,
-                               feature_vector=False)
-
-
-        shape = np.shape(self.hog_samples)
-        print(shape)
-        window_width = shape[0]
-
+        img_for_hog = pp.convert_img_for_hog(img)
+        hogs_list = pp.extract_hog_features(img_for_hog, feature_vector=False)
+        hogs = np.array(hogs_list)
+        shape = np.shape(hogs)
+        window_width = shape[1]
+        img_width_in_blocks = shape[2]
         start_col = 0
-        while (shape[1] - start_col >= window_width):
-            hog_samples = self.hog_samples[:, start_col:start_col + window_width, :, :, ]
-            self.images.append((start_col, hog_samples))
+        while (img_width_in_blocks - start_col >= window_width):
+            hogs_subsample = hogs[:, :, start_col:start_col + window_width, :, :,]
+            self.feature_windows.append((start_col, hogs_subsample.ravel()))
             start_col += self.horizontal_block_step
