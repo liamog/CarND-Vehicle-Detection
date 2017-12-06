@@ -1,5 +1,6 @@
 
 import numpy as np
+from scipy.ndimage.measurements import label
 from skimage.feature import hog
 
 import config
@@ -13,16 +14,45 @@ class VehicleDetector():
     """The Vehicle Detector Class."""
 
     def __init__(self):
-            """Initializer."""
-            # Set to the image currently being processed
-            self.source_img = None
-            self.classifier = Classifier()
+        """Initializer."""
+        # Set to the image currently being processed
+        self.classifier = Classifier()
+        self.bounding_boxes = []
+        self.detections = []
+        self.final_img = None
+
+    def build_heat_map(self):
+        self.heatmap = np.zeros_like(self.detections_img)
+        for detections_frame in self.detections:
+            for box in detections_frame:
+                self.heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
+        self.heatmap[self.heatmap <= config.HEATMAP_THRESHOLD] = 0
+
+    def draw_labeled_bboxes(self, labels):
+        # Iterate through all detected cars
+        for car_number in range(1, labels[1] + 1):
+            # Find pixels with each car_number label value
+            nonzero = (labels[0] == car_number).nonzero()
+            # Identify x and y values of those pixels
+            nonzeroy = np.array(nonzero[0])
+            nonzerox = np.array(nonzero[1])
+            # Define a bounding box based on min/max x and y
+            bbox = ((np.min(nonzerox), np.min(nonzeroy)),
+                    (np.max(nonzerox), np.max(nonzeroy)))
+            # Draw the box on the image
+            cv2.rectangle(self.final_img, bbox[0], bbox[1], (0, 0, 255), 6)
 
     def process_image(self, img):
         # Extract each search region and resize to correct scale for search.
+        self.detections_img = np.copy(img)
+        self.final_img = np.copy(img)
         shape = np.shape(img)
         assert shape[0] == 720
         assert shape[1] == 1280
+        self.detections.insert(0, [])
+        if len(self.detections) > config.NUM_FRAMES_HEATMAP:
+            del self.detections[-1]
+        current_detections = self.detections[0]
         for scaler, bounds, scaled_region in pp.extract_regions_of_interest(img):
             sliding_window_hog = SlidingWindowHog()
             sliding_window_hog.process_image(scaled_region)
@@ -42,16 +72,23 @@ class VehicleDetector():
                         scaled_x,
                         orig_x,
                         bounds
-                        ))
-                    # TODO Draw the bounding box on the image.
-                    cv2.rectangle(img,
+                    ))
+                    current_detections.append(
+                        ((start_x, start_y), (end_x, end_y)))
+                    cv2.rectangle(self.detections_img,
                                   (start_x, start_y),
                                   (end_x , end_y),
                                   [0,255,0], 3)
 
-        return img
+        # TODO Build Heatmap
+        self.build_heat_map()
+        # TODO Extract labels from heatmap
+        labels = label(self.heatmap)
+
+        # TODO Draw the bounding box on the image.
+        self.draw_labeled_bboxes(labels)
+        return self.final_img
 
     def process_image_with_diagnostics(self, img):
         processed = self.process_image(img)
-
-
+        return processed
