@@ -7,11 +7,13 @@ import config
 import cv2
 
 def convert_img_for_hog(img_rgb):
-    channel1 = select_channel(img_rgb, 'hls_s')
-    channel1 = channel1 / 255
-    channel2 = select_channel(img_rgb, 'yuv_y')
-    channel2 = channel2 / 255
-    return np.dstack((channel1, channel2))
+    channels = []
+    for channel_name in config.INPUT_CHANNELS:
+        channel = select_channel(img_rgb, channel_name)
+        channel = channel / 255
+        channels.append(channel)
+
+    return np.stack(channels, axis=-1)
 
 def extract_hog_features(img, feature_vector=True):
     """
@@ -56,6 +58,11 @@ def color_hist(img, nbins=32):  # bins_range=(0, 256)
     # Return the individual histograms, bin_centers and feature vector
     return hist_features
 
+def extract_other_features(img):
+    spatial = bin_spatial(img)
+    colors = color_hist(img)
+    return np.concatenate((spatial, colors))
+
 #pylint ignore-too-many-return
 def select_channel(img_rgb, channel):
     """
@@ -89,7 +96,7 @@ def select_channel(img_rgb, channel):
     if channel == "yuv_v":
         img_hls = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YUV)
         return img_hls[:, :, 2]
-    if channel == "luv_y":
+    if channel == "luv_l":
         img_luv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Luv)
         return img_luv[:, :, 0]
     if channel == "luv_u":
@@ -97,7 +104,15 @@ def select_channel(img_rgb, channel):
         return img_luv[:, :, 1]
     if channel == "luv_v":
         img_luv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Luv)
-        return img_luv[:, :, 2]
+    if channel == "hsv_h":
+        img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
+        return img_hsv[:, :, 0]
+    if channel == "hsv_s":
+        img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
+        return img_hsv[:, :, 1]
+    if channel == "hsv_v":
+        img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
+        return img_hsv[:, :, 2]
     if channel == "ycrcb_y":
         img_ycrcb = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YCrCb)
         return img_ycrcb[:, :, 0]

@@ -7,7 +7,7 @@ import numpy as np
 from sklearn import svm
 from sklearn.externals import joblib
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 import config
@@ -28,8 +28,11 @@ class Classifier():
                 self._trained_model_filename = temp.name
             with tempfile.NamedTemporaryFile() as temp:
                 self._trained_model_scaler_filename = temp.name
+            with tempfile.NamedTemporaryFile() as temp:
+                self._parameter_search_results = temp.name
         else:
             self._trained_model_filename = "cached/trained_model.p"
+            self._parameter_search_results = "cached/parameter_search_results.p"
             self._trained_model_scaler_filename = "cached/trained_model_scaler.p"
             pathlib.Path("cached").mkdir(parents=True, exist_ok=True)
 
@@ -38,6 +41,7 @@ class Classifier():
 
         if os.path.isfile(self._trained_model_filename):
             self.clf = joblib.load(self._trained_model_filename)
+            print(self.clf)
 
         if os.path.isfile(self._trained_model_scaler_filename):
             self.x_scaler = joblib.load(self._trained_model_scaler_filename)
@@ -98,8 +102,21 @@ class Classifier():
         x_train, x_test, y_train, y_test = train_test_split(
             scaled_x, y_full, test_size=0.33, random_state=42)
 
-        self.clf = svm.SVC(C=10.0, kernel='rbf', gamma=0.001, verbose=True)
-        self.clf.fit(x_train, y_train)
+
+        param_grid = [
+            {'C': [1, 10, 100, 1000],
+             'gamma': [0.001, 0.0001],
+             'kernel': ['rbf']},
+        ]
+
+        svr = svm.SVC()
+        gs = GridSearchCV(svr, param_grid, n_jobs=4)
+        gs.fit(x_train, y_train)
+        print(gs.cv_results_)
+        print(gs.best_estimator_)
+        joblib.dump(gs, self._parameter_search_results)
+
+        self.clf = gs.best_estimator_
 
         y_predict = self.clf.predict(x_test)
 
@@ -119,4 +136,6 @@ class Classifier():
 
     def _extract_img_features(self, img):
         img_for_hog = pp.convert_img_for_hog(img)
-        return pp.extract_hog_features(img_for_hog)
+        hog = pp.extract_hog_features(img_for_hog)
+        other = pp.extract_other_features(img)
+        return np.concatenate((hog, other))
