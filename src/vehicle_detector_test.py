@@ -14,9 +14,9 @@ class TestVehicleDetector(unittest.TestCase):
         :param unittest.TestCase:
     """
 
-    def test_sliding_windows(self):
+    def test_process_image(self):
         """
-        Test extracting scaled regions from the image.
+        Test a single image through the pipeline.
             :param self:
         """
         img = mpimg.imread('test_images/test1.jpg')
@@ -24,6 +24,17 @@ class TestVehicleDetector(unittest.TestCase):
         # just test with one channel
         vehicle_detector = VehicleDetector()
         vehicle_detector.process_image(img)
+
+    def test_process_diagnostics_image(self):
+        """
+        Test a single image through the pipeline.
+            :param self:
+        """
+        img = mpimg.imread('test_images/test1.jpg')
+        self.assertIsNotNone(img)
+        # just test with one channel
+        vehicle_detector = VehicleDetector()
+        vehicle_detector.process_image_with_diagnostics(img)
 
 if __name__ == '__main__':
     unittest.main()

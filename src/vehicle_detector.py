@@ -1,5 +1,6 @@
 
 import numpy as np
+import scipy.misc
 from scipy.ndimage.measurements import label
 from skimage.feature import hog
 
@@ -20,6 +21,7 @@ class VehicleDetector():
         self.bounding_boxes = []
         self.detections = []
         self.final_img = None
+        self.detections_img = None
 
     def build_heat_map(self):
         self.heatmap = np.zeros_like(self.detections_img)
@@ -53,14 +55,23 @@ class VehicleDetector():
         if len(self.detections) > config.NUM_FRAMES_HEATMAP:
             del self.detections[-1]
         current_detections = self.detections[0]
-        for scaler, bounds, scaled_region in pp.extract_regions_of_interest(img):
+        self.regions_of_interest = pp.extract_regions_of_interest(img)
+        for scaler, bounds, scaled_region in self.regions_of_interest:
             sliding_window_hog = SlidingWindowHog()
             sliding_window_hog.process_image(scaled_region)
+
             for col_start, sub_features in sliding_window_hog.feature_windows:
                 if self.classifier.predict(sub_features.ravel()) == 1:
+
+
                     scaled_x = col_start * \
                         config.HOG_PIXELS_PER_CELL[0]
                     orig_x = scaled_x * scaler
+
+                    cv2.rectangle(scaled_region,
+                                  (scaled_x, 0),
+                                  (scaled_x + 64, 64),
+                                  [0, 255, 0], 3)
 
                     start_x = int(orig_x)
                     end_x = start_x + int(64 * scaler)
@@ -71,7 +82,7 @@ class VehicleDetector():
                         col_start,
                         scaled_x,
                         orig_x,
-                        bounds
+                        ((start_x, start_y),(end_x, end_y)),
                     ))
                     current_detections.append(
                         ((start_x, start_y), (end_x, end_y)))
@@ -91,4 +102,30 @@ class VehicleDetector():
 
     def process_image_with_diagnostics(self, img):
         processed = self.process_image(img)
-        return processed
+        """Process the image and append diagnostics to image."""
+        size = np.shape(img)
+
+        # 4 panels of diagnostics
+        size = (int(size[0] / 2), int(size[1] / 2))
+
+        # raw detection boxes
+        det = scipy.misc.imresize(self.detections_img, size)
+
+        # Heat map
+        hm = scipy.misc.imresize(self.heatmap, size)
+
+        # Search regions
+        vsize = int(size[0]/len(self.regions_of_interest))
+        region_size=(vsize, size[1])
+        slice_imgs = []
+        for scaler, bounds, scaled_region in self.regions_of_interest:
+            rii = scipy.misc.imresize(scaled_region, region_size)
+            slice_imgs.append(rii)
+        regions = np.vstack(slice_imgs)
+
+        diags_1_r1 =np.hstack((det, hm))
+        diags_1_r2 = np.hstack((regions, np.zeros_like(regions)))
+        diags_1 = np.vstack((diags_1_r1, diags_1_r2))
+
+        final_plus_diags = np.hstack((processed, diags_1))
+        return final_plus_diags
