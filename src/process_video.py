@@ -24,7 +24,7 @@ if trouble_1:
     count = 0
     clip1 = VideoFileClip(input_filename)
     clip = clip1.fl_image(
-        detector.process_image).subclip(38, 42)
+        detector.process_image_with_diagnostics).subclip(38, 42)
     clip.write_videofile(output_diag_filename_t1, audio=False)
 
 if regular_enabled:

@@ -61,11 +61,16 @@ class VehicleDetector():
             sliding_window_hog.process_image(scaled_region)
 
             for col_start, sub_features in sliding_window_hog.feature_windows:
-                if self.classifier.predict(sub_features.ravel()) == 1:
+                scaled_x = col_start * \
+                    config.HOG_PIXELS_PER_CELL[0]
 
-
-                    scaled_x = col_start * \
-                        config.HOG_PIXELS_PER_CELL[0]
+                # Grab the same region as the hog data to add the extra
+                # color histogram and spatial features.
+                img_subsample = scaled_region[:, scaled_x:scaled_x+64, :]
+                other_features = pp.extract_other_features(img_subsample)
+                features = np.concatenate(
+                    (sub_features.ravel(), other_features))
+                if self.classifier.predict(features) == 1:
                     orig_x = scaled_x * scaler
 
                     cv2.rectangle(scaled_region,
