@@ -102,15 +102,8 @@ class Classifier():
         x_train, x_test, y_train, y_test = train_test_split(
             scaled_x, y_full, test_size=0.33, random_state=42)
 
-
-        param_grid = [
-            {'C': [1, 10, 100, 1000],
-             'gamma': [0.001, 0.0001],
-             'kernel': ['rbf']},
-        ]
-
         svr = svm.SVC()
-        gs = GridSearchCV(svr, param_grid, n_jobs=4)
+        gs = GridSearchCV(svr, config.PARAM_GRID, n_jobs=4)
         gs.fit(x_train, y_train)
         print(gs.cv_results_)
         print(gs.best_estimator_)
@@ -121,6 +114,7 @@ class Classifier():
         y_predict = self.clf.predict(x_test)
 
         self.accuracy = accuracy_score(y_test, y_predict)
+        print("accuracy = {}".format(self.accuracy))
 
         joblib.dump(self.clf, self._trained_model_filename)
         joblib.dump(self.x_scaler, self._trained_model_scaler_filename)

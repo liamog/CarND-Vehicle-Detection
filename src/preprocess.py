@@ -59,8 +59,10 @@ def color_hist(img, nbins=32):  # bins_range=(0, 256)
     return hist_features
 
 def extract_other_features(img):
-    spatial = bin_spatial(img)
-    colors = color_hist(img)
+    if config.USE_SPATIAL:
+       spatial = bin_spatial(img)
+    if config.USE_COLOR_HIST:
+        colors = color_hist(img)
     return np.concatenate((spatial, colors))
 
 #pylint ignore-too-many-return
@@ -78,6 +80,7 @@ def select_channel(img_rgb, channel):
         return img_rgb[:, :, 1]
     if channel == "rgb_b":
         return img_rgb[:, :, 2]
+
     if channel == "hls_h":
         img_hls = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HLS)
         return img_hls[:, :, 0]
@@ -87,6 +90,7 @@ def select_channel(img_rgb, channel):
     if channel == "hls_s":
         img_hls = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HLS)
         return img_hls[:, :, 2]
+
     if channel == "yuv_y":
         img_hls = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YUV)
         return img_hls[:, :, 0]
@@ -96,6 +100,7 @@ def select_channel(img_rgb, channel):
     if channel == "yuv_v":
         img_hls = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YUV)
         return img_hls[:, :, 2]
+
     if channel == "luv_l":
         img_luv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Luv)
         return img_luv[:, :, 0]
@@ -104,6 +109,8 @@ def select_channel(img_rgb, channel):
         return img_luv[:, :, 1]
     if channel == "luv_v":
         img_luv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Luv)
+        return img_luv[:, :, 2]
+
     if channel == "hsv_h":
         img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
         return img_hsv[:, :, 0]
@@ -113,6 +120,7 @@ def select_channel(img_rgb, channel):
     if channel == "hsv_v":
         img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
         return img_hsv[:, :, 2]
+
     if channel == "ycrcb_y":
         img_ycrcb = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YCrCb)
         return img_ycrcb[:, :, 0]
