@@ -107,7 +107,7 @@ class Classifier():
         gs.fit(x_train, y_train)
         print(gs.cv_results_)
         print(gs.best_estimator_)
-        joblib.dump(gs, self._parameter_search_results)
+        joblib.dump(gs.cv_results_, self._parameter_search_results)
 
         self.clf = gs.best_estimator_
 
