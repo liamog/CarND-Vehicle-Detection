@@ -7,18 +7,22 @@ import config
 import cv2
 
 def convert_img_for_hog(img_rgb):
+    """
+    Converts the image to the set of color channels specified in config.
+        :param img_rgb: image to convert in RGB
+    """
     channels = []
     for channel_name in config.INPUT_CHANNELS:
         channel = select_channel(img_rgb, channel_name)
         channel = channel / 255
         channels.append(channel)
-
     return np.stack(channels, axis=-1)
 
 def extract_hog_features(img, feature_vector=True):
     """
     Extract a set of hog features for the img.
-        :param img:
+        :param img: image to extract
+        :param feature_vector: image to extract
     """
     shape = np.shape(img)
     #Only support extracting features for images px 64 high but any width
@@ -27,27 +31,31 @@ def extract_hog_features(img, feature_vector=True):
     assert len(shape) == 3
     assert shape[0] == 64
     hogs = []
+    visuals = []
     for ii in range(shape[2]):
-        hogs.append(hog(img[:, :, ii],
+        hog_feat, vis = hog(img[:, :, ii],
                 orientations=config.HOG_ORIENTATIONS,
                 pixels_per_cell=config.HOG_PIXELS_PER_CELL,
                 cells_per_block=config.HOG_CELLS_PER_BLOCK,
-                visualise=False,
+                visualise=True,
                 feature_vector=False,
-                block_norm='L2-Hys'))
+                block_norm='L2-Hys')
+        hogs.append(hog_feat)
+        visuals.append(hog_feat)
 
     if feature_vector:
-        return np.ravel(hogs)
+        return np.ravel(hogs), visuals
 
-    return hogs
+    return hogs, visuals
 
-def bin_spatial(img, size=(32, 32)):
+def bin_spatial(img, size=(16, 16)):
     color1 = cv2.resize(img[:, :, 0], size).ravel()
     color2 = cv2.resize(img[:, :, 1], size).ravel()
     color3 = cv2.resize(img[:, :, 2], size).ravel()
     return np.hstack((color1, color2, color3))
 
-def color_hist(img, nbins=32):  # bins_range=(0, 256)
+def color_hist(img, nbins=16):
+    # bins_range=(0, 256)
     # Compute the histogram of the color channels separately
     channel1_hist = np.histogram(img[:, :, 0], bins=nbins)
     channel2_hist = np.histogram(img[:, :, 1], bins=nbins)
@@ -55,15 +63,19 @@ def color_hist(img, nbins=32):  # bins_range=(0, 256)
     # Concatenate the histograms into a single feature vector
     hist_features = np.concatenate(
         (channel1_hist[0], channel2_hist[0], channel3_hist[0]))
-    # Return the individual histograms, bin_centers and feature vector
     return hist_features
 
 def extract_other_features(img):
+    retval = None
     if config.USE_SPATIAL:
-       spatial = bin_spatial(img)
+       retval = bin_spatial(img)
     if config.USE_COLOR_HIST:
         colors = color_hist(img)
-    return np.concatenate((spatial, colors))
+        if retval is not None:
+            np.concatenate((retval, colors))
+        else :
+            retval = colors
+    return retval
 
 #pylint ignore-too-many-return
 def select_channel(img_rgb, channel):

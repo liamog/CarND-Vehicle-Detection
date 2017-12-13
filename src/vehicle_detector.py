@@ -14,20 +14,23 @@ from sliding_window_hog import SlidingWindowHog
 class VehicleDetector():
     """The Vehicle Detector Class."""
 
-    def __init__(self):
+    def __init__(self, unit_test=False):
         """Initializer."""
         # Set to the image currently being processed
-        self.classifier = Classifier()
+        self.classifier = Classifier(unit_test)
         self.bounding_boxes = []
         self.detections = []
         self.final_img = None
         self.detections_img = None
 
     def build_heat_map(self):
-        self.heatmap = np.zeros_like(self.detections_img)
+        shape = np.shape(self.detections_img)
+        self.heatmap = np.zeros((shape[0], shape[1]))
         for detections_frame in self.detections:
             for box in detections_frame:
                 self.heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
+        self.heatmap_diagnostics = np.copy(self.heatmap)
+        self.heatmap_diagnostics *= 15
         self.heatmap[self.heatmap <= config.HEATMAP_THRESHOLD] = 0
 
     def draw_labeled_bboxes(self, labels):
@@ -67,7 +70,9 @@ class VehicleDetector():
                 # Grab the same region as the hog data to add the extra
                 # color histogram and spatial features.
                 img_subsample = scaled_region[:, scaled_x:scaled_x+64, :]
-                other_features = pp.extract_other_features(img_subsample)
+                other_features = []
+                if config.USE_SPATIAL or config.USE_COLOR_HIST:
+                    other_features = pp.extract_other_features(img_subsample)
                 features = np.concatenate(
                     (sub_features.ravel(), other_features))
                 if self.classifier.predict(features) == 1:
@@ -83,12 +88,12 @@ class VehicleDetector():
                     start_y = bounds[0][1]
                     end_y = bounds[1][1]
 
-                    print("found vehicle - block start = {}, scaled_px={}, orig_px={}, bounds={}".format(
-                        col_start,
-                        scaled_x,
-                        orig_x,
-                        ((start_x, start_y),(end_x, end_y)),
-                    ))
+                    # print("found vehicle - block start = {}, scaled_px={}, orig_px={}, bounds={}".format(
+                    #     col_start,
+                    #     scaled_x,
+                    #     orig_x,
+                    #     ((start_x, start_y),(end_x, end_y)),
+                    # ))
                     current_detections.append(
                         ((start_x, start_y), (end_x, end_y)))
                     cv2.rectangle(self.detections_img,
@@ -117,7 +122,8 @@ class VehicleDetector():
         det = scipy.misc.imresize(self.detections_img, size)
 
         # Heat map
-        hm = scipy.misc.imresize(self.heatmap, size)
+        hm = scipy.misc.imresize(self.heatmap_diagnostics, size)
+        hm = np.dstack((hm, np.zeros_like(hm), np.zeros_like(hm)))
 
         # Search regions
         vsize = int(size[0]/len(self.regions_of_interest))

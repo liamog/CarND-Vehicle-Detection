@@ -32,8 +32,9 @@ class TestPreprocess(unittest.TestCase):
         """
         dummy = np.zeros((64, 64, 1))
 
-        hog = pp.extract_hog_features(dummy)
-        self.assertGreater(len(hog), 2000)
+        hog, visuals = pp.extract_hog_features(dummy)
+        # This number will depend on the number of blocks per cell.
+        self.assertGreater(len(hog), 1000)
 
     def test_hog_multi_channel(self):
         """
@@ -42,8 +43,8 @@ class TestPreprocess(unittest.TestCase):
         """
         dummy = np.zeros((64, 64, 2))
 
-        hog = pp.extract_hog_features(dummy)
-        self.assertGreater(len(hog), 4000)
+        hog, visuals = pp.extract_hog_features(dummy)
+        self.assertGreater(len(hog), 3000)
 
 if __name__ == '__main__':
     unittest.main()

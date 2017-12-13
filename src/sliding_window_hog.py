@@ -10,15 +10,14 @@ import preprocess as pp
 
 class SlidingWindowHog():
 
-    def __init__(self, horizontal_block_step = 2):
+    def __init__(self):
         self.feature_windows = []
-
-        self.horizontal_block_step = horizontal_block_step
+        self.visuals = None
 
     def process_image(self, img):
         '''Returns the set of feature vectors to classify from this subimage'''
         img_for_hog = pp.convert_img_for_hog(img)
-        hogs_list = pp.extract_hog_features(img_for_hog, feature_vector=False)
+        hogs_list, self.visuals = pp.extract_hog_features(img_for_hog, feature_vector=False)
         hogs = np.array(hogs_list)
         shape = np.shape(hogs)
         window_width = shape[1]
@@ -27,4 +26,4 @@ class SlidingWindowHog():
         while (img_width_in_blocks - start_col >= window_width):
             hogs_subsample = hogs[:, :, start_col:start_col + window_width, :, :,]
             self.feature_windows.append((start_col, hogs_subsample.ravel()))
-            start_col += self.horizontal_block_step
+            start_col += config.HOG_BLOCK_STEPS

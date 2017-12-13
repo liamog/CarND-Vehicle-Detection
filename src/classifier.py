@@ -31,10 +31,12 @@ class Classifier():
             with tempfile.NamedTemporaryFile() as temp:
                 self._parameter_search_results = temp.name
         else:
-            self._trained_model_filename = "cached/trained_model.p"
-            self._parameter_search_results = "cached/parameter_search_results.p"
-            self._trained_model_scaler_filename = "cached/trained_model_scaler.p"
-            pathlib.Path("cached").mkdir(parents=True, exist_ok=True)
+            self._trained_model_filename = config.RESULTS_FOLDER + "/model/trained_model.p"
+            self._parameter_search_results = config.RESULTS_FOLDER + \
+                "/model/parameter_search_results.p"
+            self._trained_model_scaler_filename = config.RESULTS_FOLDER + \
+                "/model/trained_model_scaler.p"
+            pathlib.Path(config.RESULTS_FOLDER + "/model").mkdir(parents=True, exist_ok=True)
 
         self.clf = None
         self.x_scaler = None
@@ -50,8 +52,6 @@ class Classifier():
             self._train()
 
     def _train(self):
-        self.clf = svm.SVC(C=10.0, kernel='rbf', gamma=0.001)
-
         exten = '.png'
         vehicle_files = []
         nonvehicle_files = []
@@ -79,12 +79,14 @@ class Classifier():
         y_nonvehicles = []
 
         for filename in vehicle_files:
-            img_rgb = cv2.imread(filename)
+            img = cv2.imread(filename)
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             x_vehicles.append(self._extract_img_features(img_rgb))
             y_vehicles.append(1)
 
         for filename in nonvehicle_files:
-            img_rgb = cv2.imread(filename)
+            img = cv2.imread(filename)
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             x_nonvehicles.append(self._extract_img_features(img_rgb))
             y_nonvehicles.append(0)
 
@@ -99,11 +101,12 @@ class Classifier():
         self.x_scaler = StandardScaler().fit(x_full)
         scaled_x = self.x_scaler.transform(x_full)
 
+        rand_state = np.random.randint(0, 100)
         x_train, x_test, y_train, y_test = train_test_split(
-            scaled_x, y_full, test_size=0.33, random_state=42)
+            scaled_x, y_full, test_size=0.2, random_state=rand_state)
 
         svr = svm.SVC()
-        gs = GridSearchCV(svr, config.PARAM_GRID, n_jobs=4)
+        gs = GridSearchCV(svr, config.PARAM_GRID, n_jobs=-1)
         gs.fit(x_train, y_train)
         print(gs.cv_results_)
         print(gs.best_estimator_)
@@ -130,6 +133,9 @@ class Classifier():
 
     def _extract_img_features(self, img):
         img_for_hog = pp.convert_img_for_hog(img)
-        hog = pp.extract_hog_features(img_for_hog)
-        other = pp.extract_other_features(img)
-        return np.concatenate((hog, other))
+        hog, visuals = pp.extract_hog_features(img_for_hog)
+
+        if config.USE_SPATIAL or config.USE_COLOR_HIST:
+            other = pp.extract_other_features(img)
+            return np.concatenate((hog, other))
+        return hog

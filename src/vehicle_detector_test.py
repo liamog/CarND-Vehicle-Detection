@@ -22,7 +22,7 @@ class TestVehicleDetector(unittest.TestCase):
         img = mpimg.imread('test_images/test1.jpg')
         self.assertIsNotNone(img)
         # just test with one channel
-        vehicle_detector = VehicleDetector()
+        vehicle_detector = VehicleDetector(unit_test=True)
         vehicle_detector.process_image(img)
 
     def test_process_diagnostics_image(self):
@@ -33,7 +33,7 @@ class TestVehicleDetector(unittest.TestCase):
         img = mpimg.imread('test_images/test1.jpg')
         self.assertIsNotNone(img)
         # just test with one channel
-        vehicle_detector = VehicleDetector()
+        vehicle_detector = VehicleDetector(unit_test=True)
         vehicle_detector.process_image_with_diagnostics(img)
 
 if __name__ == '__main__':

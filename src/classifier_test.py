@@ -12,7 +12,7 @@ class TestClassifier(unittest.TestCase):
         print(acc)
 
     def test_model(self):
-        classifier = Classifier(unit_test=False)
+        classifier = Classifier(unit_test=True)
 
 if __name__ == '__main__':
     unittest.main()
