@@ -3,3 +3,5 @@ project_video_imgs/*
 src/__pycache__
 .vscode/*
 .ipynb_checkpoints
+results*/*
+test_images_conseq/*
