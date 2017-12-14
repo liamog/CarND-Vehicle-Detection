@@ -133,7 +133,7 @@ class Classifier():
 
     def _extract_img_features(self, img):
         img_for_hog = pp.convert_img_for_hog(img)
-        hog, visuals = pp.extract_hog_features(img_for_hog)
+        hog = pp.extract_hog_features(img_for_hog)
 
         if config.USE_SPATIAL or config.USE_COLOR_HIST:
             other = pp.extract_other_features(img)

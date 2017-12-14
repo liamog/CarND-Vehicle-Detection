@@ -16,22 +16,31 @@ class VehicleDetector():
 
     def __init__(self, unit_test=False):
         """Initializer."""
-        # Set to the image currently being processed
         self.classifier = Classifier(unit_test)
         self.bounding_boxes = []
         self.detections = []
         self.final_img = None
         self.detections_img = None
+        self.heatmap = None
+        self.heatmap_diagnostics = None
 
     def build_heat_map(self):
         shape = np.shape(self.detections_img)
-        self.heatmap = np.zeros((shape[0], shape[1]))
+        self.heatmap = np.zeros((shape[0], shape[1]), dtype=float)
         for detections_frame in self.detections:
             for box in detections_frame:
-                self.heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
+                self.heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1.0
         self.heatmap_diagnostics = np.copy(self.heatmap)
         self.heatmap_diagnostics *= 15
-        self.heatmap[self.heatmap <= config.HEATMAP_THRESHOLD] = 0
+        heat_non_zero_values = self.heatmap[self.heatmap.nonzero()]
+        heat_mean = heat_non_zero_values.mean()
+        heat_sigma = heat_non_zero_values.std()
+
+        heat_factor = 1.0
+        self.heatmap[self.heatmap <= heat_mean + heat_sigma * heat_factor] = 0
+        self.heat_histogram = np.histogram(
+            self.heatmap[self.heatmap.nonzero()])
+        print(self.heat_histogram)
 
     def draw_labeled_bboxes(self, labels):
         # Iterate through all detected cars
@@ -54,9 +63,13 @@ class VehicleDetector():
         shape = np.shape(img)
         assert shape[0] == 720
         assert shape[1] == 1280
+
+        # Prune older video frames from heatmap
         self.detections.insert(0, [])
         if len(self.detections) > config.NUM_FRAMES_HEATMAP:
             del self.detections[-1]
+
+        # Fill in current detections
         current_detections = self.detections[0]
         self.regions_of_interest = pp.extract_regions_of_interest(img)
         for scaler, bounds, scaled_region in self.regions_of_interest:
@@ -88,12 +101,6 @@ class VehicleDetector():
                     start_y = bounds[0][1]
                     end_y = bounds[1][1]
 
-                    # print("found vehicle - block start = {}, scaled_px={}, orig_px={}, bounds={}".format(
-                    #     col_start,
-                    #     scaled_x,
-                    #     orig_x,
-                    #     ((start_x, start_y),(end_x, end_y)),
-                    # ))
                     current_detections.append(
                         ((start_x, start_y), (end_x, end_y)))
                     cv2.rectangle(self.detections_img,
@@ -101,12 +108,8 @@ class VehicleDetector():
                                   (end_x , end_y),
                                   [0,255,0], 3)
 
-        # TODO Build Heatmap
         self.build_heat_map()
-        # TODO Extract labels from heatmap
         labels = label(self.heatmap)
-
-        # TODO Draw the bounding box on the image.
         self.draw_labeled_bboxes(labels)
         return self.final_img
 

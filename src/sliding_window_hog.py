@@ -17,7 +17,7 @@ class SlidingWindowHog():
     def process_image(self, img):
         '''Returns the set of feature vectors to classify from this subimage'''
         img_for_hog = pp.convert_img_for_hog(img)
-        hogs_list, self.visuals = pp.extract_hog_features(img_for_hog, feature_vector=False)
+        hogs_list = pp.extract_hog_features(img_for_hog, feature_vector=False)
         hogs = np.array(hogs_list)
         shape = np.shape(hogs)
         window_width = shape[1]

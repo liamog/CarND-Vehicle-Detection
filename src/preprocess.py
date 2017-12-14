@@ -31,22 +31,20 @@ def extract_hog_features(img, feature_vector=True):
     assert len(shape) == 3
     assert shape[0] == 64
     hogs = []
-    visuals = []
     for ii in range(shape[2]):
-        hog_feat, vis = hog(img[:, :, ii],
+        hog_feat = hog(img[:, :, ii],
                 orientations=config.HOG_ORIENTATIONS,
                 pixels_per_cell=config.HOG_PIXELS_PER_CELL,
                 cells_per_block=config.HOG_CELLS_PER_BLOCK,
-                visualise=True,
+                visualise=False,
                 feature_vector=False,
                 block_norm='L2-Hys')
         hogs.append(hog_feat)
-        visuals.append(hog_feat)
 
     if feature_vector:
-        return np.ravel(hogs), visuals
+        return np.ravel(hogs)
 
-    return hogs, visuals
+    return hogs
 
 def bin_spatial(img, size=(16, 16)):
     color1 = cv2.resize(img[:, :, 0], size).ravel()

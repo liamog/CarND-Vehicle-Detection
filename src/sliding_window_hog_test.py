@@ -21,7 +21,7 @@ class TestSlidingWindow(unittest.TestCase):
         """
         dummy = np.zeros((64, 64, 3), np.uint8)
         img_for_hog = pp.convert_img_for_hog(dummy)
-        dummy_hog, dummy_visuals = pp.extract_hog_features(img_for_hog)
+        dummy_hog = pp.extract_hog_features(img_for_hog)
         dummy_shape = np.shape(dummy_hog)
 
         img = np.zeros((64, 1280, 3), np.uint8)

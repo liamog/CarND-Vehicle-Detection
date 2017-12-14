@@ -32,7 +32,7 @@ class TestPreprocess(unittest.TestCase):
         """
         dummy = np.zeros((64, 64, 1))
 
-        hog, visuals = pp.extract_hog_features(dummy)
+        hog = pp.extract_hog_features(dummy)
         # This number will depend on the number of blocks per cell.
         self.assertGreater(len(hog), 1000)
 
@@ -43,7 +43,7 @@ class TestPreprocess(unittest.TestCase):
         """
         dummy = np.zeros((64, 64, 2))
 
-        hog, visuals = pp.extract_hog_features(dummy)
+        hog = pp.extract_hog_features(dummy)
         self.assertGreater(len(hog), 3000)
 
 if __name__ == '__main__':

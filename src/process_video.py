@@ -34,19 +34,19 @@ def override_config_from_dict(input_values):
         config.HEATMAP_THRESHOLD = input_values["HEATMAP_THRESHOLD"]
 
 override_config_from_dict({
-    "INPUT_CHANNELS": ['ycrcb_cr'],
+    "INPUT_CHANNELS": ['hls_h', 'hls_l', 'hls_s'],
     "HOG_CELLS_PER_BLOCK": (3, 3),
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
-    "RESULTS_FOLDER": "results/ycrcb_all_extra_3x3_steps_4",
-    "NUM_FRAMES_HEATMAP": 2,
+    "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4",
+    "NUM_FRAMES_HEATMAP": 25,
     "HEATMAP_THRESHOLD": 3
 })
 
-diagnostics_enabled = True
-regular_enabled = True
-trouble_1 = False
+diagnostics_enabled = False
+regular_enabled = False
+trouble_1 = True
 input_base = "project_video"
 
 input_filename = input_base + ".mp4"
@@ -59,7 +59,7 @@ if trouble_1:
     count = 0
     clip1 = VideoFileClip(input_filename)
     clip = clip1.fl_image(
-        detector.process_image_with_diagnostics).subclip(38, 42)
+        detector.process_image_with_diagnostics).subclip(35, 45)
     clip.write_videofile(output_diag_filename_t1, audio=False)
 
 if regular_enabled:
