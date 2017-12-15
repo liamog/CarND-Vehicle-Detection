@@ -30,32 +30,40 @@ def override_config_from_dict(input_values):
     if input_values["NUM_FRAMES_HEATMAP"] is not None:
         config.NUM_FRAMES_HEATMAP = input_values["NUM_FRAMES_HEATMAP"]
 
-    if input_values["HEATMAP_THRESHOLD"] is not None:
-        config.HEATMAP_THRESHOLD = input_values["HEATMAP_THRESHOLD"]
+    if input_values["HEATMAP_THRESHOLD_HIGH"] is not None:
+        config.HEATMAP_THRESHOLD_HIGH = input_values["HEATMAP_THRESHOLD_HIGH"]
+    if input_values["HEATMAP_THRESHOLD_LOW"] is not None:
+        config.HEATMAP_THRESHOLD_LOW = input_values["HEATMAP_THRESHOLD_LOW"]
 
 override_config_from_dict({
-    "INPUT_CHANNELS": ['hls_h', 'hls_l', 'hls_s'],
+    "INPUT_CHANNELS": ['hls_all'],
     "HOG_CELLS_PER_BLOCK": (3, 3),
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4",
-    "NUM_FRAMES_HEATMAP": 25,
-    "HEATMAP_THRESHOLD": 3
+    "NUM_FRAMES_HEATMAP": 10,
+    "HEATMAP_THRESHOLD_HIGH": 10,
+    "HEATMAP_THRESHOLD_LOW": 2
 })
 
 diagnostics_enabled = False
 regular_enabled = False
 trouble_1 = True
+output_images = True
 input_base = "project_video"
 
 input_filename = input_base + ".mp4"
 output_filename = input_base + "_with_vehicles.mp4"
 output_diag_filename_t1 = input_base + "_t1_with_vehicles.mp4"
 output_diag_filename = input_base + "_with_diagnostics.mp4"
-detector = VehicleDetector()
+output_images_diag = "video_output_images/diag"
+
+if not output_images:
+    output_images_diag = None
 
 if trouble_1:
+    detector = VehicleDetector(save_images_folder=output_images_diag)
     count = 0
     clip1 = VideoFileClip(input_filename)
     clip = clip1.fl_image(
@@ -63,12 +71,14 @@ if trouble_1:
     clip.write_videofile(output_diag_filename_t1, audio=False)
 
 if regular_enabled:
+    detector = VehicleDetector()
     count = 0
     clip1 = VideoFileClip(input_filename)
     clip = clip1.fl_image(detector.process_image)
     clip.write_videofile(output_filename, audio=False)
 
 if diagnostics_enabled:
+    detector = VehicleDetector(save_images_folder=output_images_diag)
     count = 0
     clip1 = VideoFileClip(input_filename)
     clip = clip1.fl_image(detector.process_image_with_diagnostics)

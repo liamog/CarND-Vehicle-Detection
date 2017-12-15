@@ -44,14 +44,33 @@ configs = []
 #     "RESULTS_FOLDER": "results/hls_s_no_extra_3x3_steps_4"
 # })
 
+# configs.append({
+#     "INPUT_CHANNELS": ['hls_all'],
+#     "HOG_CELLS_PER_BLOCK": (4, 4),
+#     "HOG_BLOCK_STEPS": 3,
+#     "USE_SPATIAL": True,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/hls_hls_spatial_color_4x4_steps_4"
+# })
+
 configs.append({
-    "INPUT_CHANNELS": ['hls_h', 'hls_l', 'hls_s'],
+    "INPUT_CHANNELS": ['hls_all'],
     "HOG_CELLS_PER_BLOCK": (3, 3),
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4"
 })
+
+
+# configs.append({
+#     "INPUT_CHANNELS": ['YCrCb_all'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": False,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/YCrCb_all_color_3x3_steps_4"
+# })
 
 # configs.append({
 #     "INPUT_CHANNELS": ['luv_l'],
@@ -99,7 +118,7 @@ configs.append({
 # })
 
 # configs.append({
-#     "INPUT_CHANNELS": ['yuv_y', 'yuv_u', 'yuv_v'],
+#     "INPUT_CHANNELS": ['yuv_all'],
 #     "HOG_CELLS_PER_BLOCK": (3, 3),
 #     "HOG_BLOCK_STEPS": 4,
 #     "USE_SPATIAL": False,
@@ -117,7 +136,7 @@ configs.append({
 # })
 
 # configs.append({
-#     "INPUT_CHANNELS": ['yuv_y', 'yuv_u', 'yuv_v'],
+#     "INPUT_CHANNELS": ['yuv_all'],
 #     "HOG_CELLS_PER_BLOCK": (2, 2),
 #     "HOG_BLOCK_STEPS": 4,
 #     "USE_SPATIAL": False,
@@ -126,7 +145,7 @@ configs.append({
 # })
 
 # configs.append({
-#     "INPUT_CHANNELS": ['yuv_y', 'yuv_u', 'yuv_v'],
+#     "INPUT_CHANNELS": ['yuv_all'],
 #     "HOG_CELLS_PER_BLOCK": (3, 3),
 #     "HOG_BLOCK_STEPS": 4,
 #     "USE_SPATIAL": True,

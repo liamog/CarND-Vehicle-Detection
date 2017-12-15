@@ -13,6 +13,10 @@ def convert_img_for_hog(img_rgb):
     """
     channels = []
     for channel_name in config.INPUT_CHANNELS:
+        if channel_name.endswith("all"):
+            return select_all_channels(img_rgb, channel_name) / 255
+
+        #else combine other channels
         channel = select_channel(img_rgb, channel_name)
         channel = channel / 255
         channels.append(channel)
@@ -74,6 +78,21 @@ def extract_other_features(img):
         else :
             retval = colors
     return retval
+
+
+def select_all_channels(img_rgb, channel):
+    if channel == "rgb_all":
+        return img_rgb
+    if channel == "hls_all":
+        return cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HLS)
+    if channel == "luv_all":
+        return cv2.cvtColor(img_rgb, cv2.COLOR_RGB2Luv)
+    if channel == "yuv_all":
+        return cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YUV)
+    if channel == "hsv_all":
+        return cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
+    if channel == "YCrCb_all":
+        return cv2.cvtColor(img_rgb, cv2.COLOR_RGB2YCrCb)
 
 #pylint ignore-too-many-return
 def select_channel(img_rgb, channel):

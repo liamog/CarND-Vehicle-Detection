@@ -106,7 +106,7 @@ class Classifier():
             scaled_x, y_full, test_size=0.2, random_state=rand_state)
 
         svr = svm.SVC()
-        gs = GridSearchCV(svr, config.PARAM_GRID, n_jobs=-1)
+        gs = GridSearchCV(svr, config.PARAM_GRID, n_jobs=1)
         gs.fit(x_train, y_train)
         print(gs.cv_results_)
         print(gs.best_estimator_)

@@ -20,8 +20,8 @@ USE_COLOR_HIST = True
 
 #False Positive filtering
 NUM_FRAMES_HEATMAP = 4
-HEATMAP_THRESHOLD = 2
-
+HEATMAP_THRESHOLD_HIGH = 4
+HEATMAP_THRESHOLD_LOW = 2
 #Training search params for GridSearchCV
 PARAM_GRID = [
     {'C': [1, 10, 100],

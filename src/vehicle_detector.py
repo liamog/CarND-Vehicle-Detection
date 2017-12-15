@@ -1,8 +1,12 @@
 
+import pathlib
+
+import matplotlib.pyplot as pp
 import numpy as np
 import scipy.misc
-from scipy.ndimage.measurements import label
-from skimage.feature import hog
+from scipy.ndimage.filters import maximum_filter
+from scipy.ndimage.measurements import label, find_objects
+from scipy.ndimage.morphology import binary_erosion, generate_binary_structure
 
 import config
 import cv2
@@ -14,7 +18,7 @@ from sliding_window_hog import SlidingWindowHog
 class VehicleDetector():
     """The Vehicle Detector Class."""
 
-    def __init__(self, unit_test=False):
+    def __init__(self, unit_test=False, save_images_folder=None):
         """Initializer."""
         self.classifier = Classifier(unit_test)
         self.bounding_boxes = []
@@ -23,6 +27,38 @@ class VehicleDetector():
         self.detections_img = None
         self.heatmap = None
         self.heatmap_diagnostics = None
+        self.heatmap_diagnostics_2 = None
+        self.heatmap_strict = None
+        self.heatmap_filtered = None
+        self.save_images_folder = save_images_folder
+        self.count = 0
+        self.bboxes = None
+        if self.save_images_folder is not None:
+            pathlib.Path(self.save_images_folder).mkdir(
+                parents=True, exist_ok=True)
+
+    def detect_peaks(self, image):
+        neighborhood_size = 32
+        data_max = maximum_filter(image, neighborhood_size)
+
+        self.heatmap_diagnostics_2 = np.copy(data_max)
+        self.heatmap_diagnostics_2 *= 10
+
+        # maxima = (image == data_max)
+        # diff = (data_max > config.HEATMAP_THRESHOLD_LOW)
+        # maxima[diff == 0] = 0
+
+        labels, num_objects = label(data_max)
+        print("Number of maximums {}".format(num_objects))
+        slices = find_objects(labels)
+        centers = []
+        for dy, dx in slices:
+            x_center = int((dx.start + dx.stop - 1) / 2)
+            y_center = int((dy.start + dy.stop - 1) / 2)
+            centers.append((x_center, y_center))
+
+        return centers
+
 
     def build_heat_map(self):
         shape = np.shape(self.detections_img)
@@ -31,16 +67,45 @@ class VehicleDetector():
             for box in detections_frame:
                 self.heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1.0
         self.heatmap_diagnostics = np.copy(self.heatmap)
-        self.heatmap_diagnostics *= 15
-        heat_non_zero_values = self.heatmap[self.heatmap.nonzero()]
-        heat_mean = heat_non_zero_values.mean()
-        heat_sigma = heat_non_zero_values.std()
+        self.heatmap_diagnostics *= 10
 
-        heat_factor = 1.0
-        self.heatmap[self.heatmap <= heat_mean + heat_sigma * heat_factor] = 0
-        self.heat_histogram = np.histogram(
-            self.heatmap[self.heatmap.nonzero()])
-        print(self.heat_histogram)
+        # First filter out spurious detections picking a high threshold to
+        # find the hottest centers.
+        self.heatmap_strict = np.copy(self.heatmap)
+        self.heatmap_strict[self.heatmap_strict <= config.HEATMAP_THRESHOLD_HIGH] = 0
+        self.centers = self.detect_peaks(self.heatmap_strict)
+
+        # Now filter out based on mean and std deviation.
+        # heat_non_zero_values = self.heatmap[self.heatmap.nonzero()]
+        # heat_mean = heat_non_zero_values.mean()
+        # heat_sigma = heat_non_zero_values.std()
+
+        # heat_factor = 0.0
+        # heatmap_strict = np.copy(self.heatmap)
+        # heatmap_strict[self.heatmap <= heat_mean + (heat_sigma * heat_factor)] = 0
+
+        # probable_detections = label(self.heatmap_strict)
+        # grow each bounding box to a max size that could be the bbox of
+        # a vehicle and then apply a lower threshold within this box
+        # get a better estimate of the bbox of the vehicle.
+
+        self.heatmap_filtered = np.zeros_like(self.heatmap_strict)
+        SEARCH_WIDTH = 100
+        SEARCH_HEIGHT = 100
+        for col,row in self.centers:
+            row_top = max(0, row - SEARCH_HEIGHT)
+            row_bottom = min(719, row + SEARCH_HEIGHT)
+            col_left = max(0, col - SEARCH_WIDTH)
+            col_right = min(1279, col + SEARCH_WIDTH)
+            self.heatmap_filtered[row_top:row_bottom, col_left:col_right] = \
+                    self.heatmap[row_top:row_bottom, col_left:col_right]
+
+        self.heatmap_filtered[self.heatmap_filtered <=
+                            config.HEATMAP_THRESHOLD_LOW] = 0
+        self.labels = label(self.heatmap_filtered)
+
+        # self.heatmap_diagnostics_2 = np.copy(self.heatmap_filtered)
+        # self.heatmap_diagnostics_2 *= 10
 
     def draw_labeled_bboxes(self, labels):
         # Iterate through all detected cars
@@ -56,7 +121,29 @@ class VehicleDetector():
             # Draw the box on the image
             cv2.rectangle(self.final_img, bbox[0], bbox[1], (0, 0, 255), 6)
 
+    def draw_centers(self, centers, radius=6) :
+        for center in centers:
+            cv2.circle(self.final_img, center, radius, (255,0,0),3)
+
+    def get_centers(self, labels):
+        centers = []
+            # Iterate through all detected cars
+        for car_number in range(1, labels[1] + 1):
+            # Find pixels with each car_number label value
+            nonzero = (labels[0] == car_number).nonzero()
+            # Identify x and y values of those pixels
+            nonzeroy = np.array(nonzero[0])
+            nonzerox = np.array(nonzero[1])
+            # Define a bounding box based on min/max x and y
+            half_width = int((np.max(nonzerox) - np.min(nonzerox)) / 2)
+            half_height = int((np.max(nonzeroy) - np.min(nonzeroy)) / 2)
+            center = (np.min(nonzerox) + half_width, np.min(nonzeroy) + half_height)
+            centers.append(center)
+        return centers
+
     def process_image(self, img):
+        self.count += 1
+
         # Extract each search region and resize to correct scale for search.
         self.detections_img = np.copy(img)
         self.final_img = np.copy(img)
@@ -109,8 +196,12 @@ class VehicleDetector():
                                   [0,255,0], 3)
 
         self.build_heat_map()
-        labels = label(self.heatmap)
-        self.draw_labeled_bboxes(labels)
+        self.draw_labeled_bboxes(self.labels)
+        self.draw_centers(self.centers)
+        if self.save_images_folder is not None:
+            filename = "{}/processed_image_{}.jpg".format(self.save_images_folder, self.count)
+            cv2.imwrite(filename, cv2.cvtColor(
+                self.final_img, cv2.COLOR_RGB2BGR))
         return self.final_img
 
     def process_image_with_diagnostics(self, img):
@@ -127,6 +218,8 @@ class VehicleDetector():
         # Heat map
         hm = scipy.misc.imresize(self.heatmap_diagnostics, size)
         hm = np.dstack((hm, np.zeros_like(hm), np.zeros_like(hm)))
+        hm2 = scipy.misc.imresize(self.heatmap_diagnostics_2, size)
+        hm2 = np.dstack((hm2, np.zeros_like(hm2), np.zeros_like(hm2)))
 
         # Search regions
         vsize = int(size[0]/len(self.regions_of_interest))
@@ -138,8 +231,13 @@ class VehicleDetector():
         regions = np.vstack(slice_imgs)
 
         diags_1_r1 =np.hstack((det, hm))
-        diags_1_r2 = np.hstack((regions, np.zeros_like(regions)))
+        diags_1_r2 = np.hstack((regions, hm2))
         diags_1 = np.vstack((diags_1_r1, diags_1_r2))
 
         final_plus_diags = np.hstack((processed, diags_1))
+        if self.save_images_folder is not None:
+            filename = "{}/diag_image_{}.jpg".format(self.save_images_folder, self.count)
+            cv2.imwrite(filename, cv2.cvtColor(
+                final_plus_diags, cv2.COLOR_RGB2BGR))
+
         return final_plus_diags
