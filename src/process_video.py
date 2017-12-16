@@ -47,8 +47,8 @@ override_config_from_dict({
     "HEATMAP_THRESHOLD_LOW": 2
 })
 
-diagnostics_enabled = False
-regular_enabled = False
+diagnostics_enabled = True
+regular_enabled = True
 trouble_1 = True
 output_images = True
 input_base = "project_video"
