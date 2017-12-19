@@ -4,6 +4,7 @@ import pathlib
 import tempfile
 
 import numpy as np
+import scipy.misc
 from sklearn import svm
 from sklearn.externals import joblib
 from sklearn.metrics import accuracy_score
@@ -81,13 +82,13 @@ class Classifier():
         for filename in vehicle_files:
             img = cv2.imread(filename)
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            x_vehicles.append(self._extract_img_features(img_rgb))
+            x_vehicles.append(self.extract_img_features(img_rgb))
             y_vehicles.append(1)
 
         for filename in nonvehicle_files:
             img = cv2.imread(filename)
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            x_nonvehicles.append(self._extract_img_features(img_rgb))
+            x_nonvehicles.append(self.extract_img_features(img_rgb))
             y_nonvehicles.append(0)
 
         assert x_vehicles
@@ -131,7 +132,18 @@ class Classifier():
         scaled_features = self.x_scaler.transform(features.reshape(1, -1))
         return self.clf.predict(scaled_features)
 
-    def _extract_img_features(self, img):
+    def predict_on_image(self, image):
+        """
+        Predict if a vehicle is present in the set of features
+            :param self:
+            :param features:
+        """
+        resized_image = scipy.misc.imresize(image, (64,64))
+        features = self.extract_img_features(resized_image)
+        return self.predict(features)
+
+
+    def extract_img_features(self, img):
         img_for_hog = pp.convert_img_for_hog(img)
         hog = pp.extract_hog_features(img_for_hog)
 

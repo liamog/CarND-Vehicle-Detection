@@ -56,7 +56,7 @@ configs = []
 configs.append({
     "INPUT_CHANNELS": ['hls_all'],
     "HOG_CELLS_PER_BLOCK": (3, 3),
-    "HOG_BLOCK_STEPS": 4,
+    "HOG_BLOCK_STEPS": 2,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4"
@@ -156,9 +156,11 @@ configs.append({
 for c in configs:
     override_config_from_dict(c)
     target_dir = os.path.join(config.RESULTS_FOLDER, 'output_images')
+    target_subimages_dir = os.path.join(config.RESULTS_FOLDER, 'output_images/sub_images')
     pathlib.Path(target_dir).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(target_subimages_dir).mkdir(parents=True, exist_ok=True)
 
-    detector = VehicleDetector()
+    detector = VehicleDetector(save_images_folder=target_subimages_dir)
     for file in files:
         # New dector for each test image as we don't want our heatmap to
         # cause weirdness over different frames.

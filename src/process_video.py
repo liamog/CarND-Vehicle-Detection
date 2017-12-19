@@ -42,14 +42,14 @@ override_config_from_dict({
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4",
-    "NUM_FRAMES_HEATMAP": 10,
-    "HEATMAP_THRESHOLD_HIGH": 10,
-    "HEATMAP_THRESHOLD_LOW": 2
+    "NUM_FRAMES_HEATMAP": 55,
+    "HEATMAP_THRESHOLD_HIGH": 35,
+    "HEATMAP_THRESHOLD_LOW": 5
 })
 
 diagnostics_enabled = True
 regular_enabled = True
-trouble_1 = True
+trouble_1 = False
 output_images = True
 input_base = "project_video"
 

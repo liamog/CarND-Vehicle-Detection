@@ -47,7 +47,106 @@
                                  xpos:xpos + nblocks_per_window].ravel()
                 hog_feat3 = hog3[ypos:ypos + nblocks_per_window,
                                  xpos:xpos + nblocks_per_window].ravel()
-                hog_features = np.hstack((hog_feat1, hog_feat2, hog_feat3))
+                hog_features = np.hsta
+# configs.append({
+#     "INPUT_CHANNELS": ['hls_s'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": False,
+#     "USE_COLOR_HIST": False,
+#     "RESULTS_FOLDER": "results/hls_s_no_extra_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['hls_h', 'hls_l', 'hls_s'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": True,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['luv_l'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": False,
+#     "USE_COLOR_HIST": False,
+#     "RESULTS_FOLDER": "results/luv_l_no_extra_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['luv_l'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": True,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/luv_l_color_spatial_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['luv_u'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": True,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/luv_u_color_spatial_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['luv_v'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": True,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/luv_v_color_spatial_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['luv_l', 'luv_v'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": True,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/luv_lv_color_spatial_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['yuv_y', 'yuv_u', 'yuv_v'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": False,
+#     "USE_COLOR_HIST": False,
+#     "RESULTS_FOLDER": "results/yuv_yuv_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['yuv_u', 'yuv_v'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": False,
+#     "USE_COLOR_HIST": False,
+#     "RESULTS_FOLDER": "results/yuv_uv_3x3_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['yuv_y', 'yuv_u', 'yuv_v'],
+#     "HOG_CELLS_PER_BLOCK": (2, 2),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": False,
+#     "USE_COLOR_HIST": False,
+#     "RESULTS_FOLDER": "results/yuv_yuv_2x2_steps_4"
+# })
+
+# configs.append({
+#     "INPUT_CHANNELS": ['yuv_y', 'yuv_u', 'yuv_v'],
+#     "HOG_CELLS_PER_BLOCK": (3, 3),
+#     "HOG_BLOCK_STEPS": 4,
+#     "USE_SPATIAL": True,
+#     "USE_COLOR_HIST": True,
+#     "RESULTS_FOLDER": "results/yuv_yuv_3x3_color_spatial_steps_4"
+# })
+ck((hog_feat1, hog_feat2, hog_feat3))
 
                 xleft = xpos * pix_per_cell
                 ytop = ypos * pix_per_cell

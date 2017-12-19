@@ -2,7 +2,7 @@
 # Region within the image to search for cars.
 NEAR_SEARCH_REGION = ((0, 392), (1280, 656))
 FAR_SEARCH_REGION = ((10, 408), (1280 - 10, 460))
-SCALE_SAMPLES = 8
+SCALE_SAMPLES = 5
 
 #Which color channels to use for HOG feature extraction
 INPUT_CHANNELS = ['hls_s']
@@ -19,9 +19,9 @@ USE_SPATIAL = True
 USE_COLOR_HIST = True
 
 #False Positive filtering
-NUM_FRAMES_HEATMAP = 4
-HEATMAP_THRESHOLD_HIGH = 4
-HEATMAP_THRESHOLD_LOW = 2
+NUM_FRAMES_HEATMAP = 50         # approx 2 seconds of data.
+HEATMAP_THRESHOLD_HIGH = 25
+HEATMAP_THRESHOLD_LOW = 5
 #Training search params for GridSearchCV
 PARAM_GRID = [
     {'C': [1, 10, 100],
