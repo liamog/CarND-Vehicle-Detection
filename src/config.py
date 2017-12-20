@@ -20,12 +20,11 @@ USE_COLOR_HIST = True
 
 #False Positive filtering
 NUM_FRAMES_HEATMAP = 50         # approx 2 seconds of data.
-HEATMAP_THRESHOLD_HIGH = 25
-HEATMAP_THRESHOLD_LOW = 5
+HEATMAP_THRESHOLD_FACTOR = 0.9
+MIN_FRAMES = 5
 #Training search params for GridSearchCV
 PARAM_GRID = [
     {'C': [1, 10, 100],
-     'gamma': [0.01, 0.001, 0.0001],
      'kernel': ['linear']},
 ]
 

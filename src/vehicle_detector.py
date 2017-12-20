@@ -61,27 +61,34 @@ class VehicleDetector():
         self.heatmap = np.zeros((shape[0], shape[1]), dtype=float)
         self.heatmap_diagnostics = np.copy(self.heatmap)
         self.heatmap_diagnostics_2 = np.copy(self.heatmap)
+        num_frames_integrated = len(self.detections)
+        print(num_frames_integrated)
 
         for detections_frame in self.detections:
+            frame_heatmap = np.zeros_like(self.heatmap)
             for box in detections_frame:
-                self.heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1.0
+                frame_heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] = 1.0
+            self.heatmap += frame_heatmap
+
+        self.heatmap_strict = np.copy(self.heatmap)
+
+        # Apply heatmap factor filter. First get the percentage
+        self.heatmap_strict = self.heatmap_strict / num_frames_integrated
+
+        self.heatmap_strict[self.heatmap_strict <=
+                            config.HEATMAP_THRESHOLD_FACTOR] = 0
 
         # Now filter out based on mean and std deviation.
-        heat_non_zero_values = self.heatmap[self.heatmap.nonzero()]
-        heat_mean = heat_non_zero_values.mean()
-        heat_sigma = heat_non_zero_values.std()
+        # heat_non_zero_values = self.heatmap[self.heatmap.nonzero()]
+        # heat_mean = heat_non_zero_values.mean()
+        # heat_sigma = heat_non_zero_values.std()
 
         self.heatmap_diagnostics = np.copy(self.heatmap)
-
-        # First filter out spurious detections picking a high threshold to
-        # find the hottest centers.
-        heat_factor = 1.0
-        self.heatmap_strict = np.copy(self.heatmap)
-        self.heatmap_strict[self.heatmap <= heat_mean + (heat_sigma * heat_factor)] = 0
-        self.heatmap_strict[self.heatmap_strict <=
-                            config.HEATMAP_THRESHOLD_LOW] = 0
-
         self.heatmap_diagnostics_2 = np.copy(self.heatmap_strict)
+        #skip detection if we don't have a minimum number of frames.
+        if num_frames_integrated < config.MIN_FRAMES:
+            return
+
         self.labels = label(self.heatmap_strict)
 
     def extract_boxes_from_contours(self, probable_detections):

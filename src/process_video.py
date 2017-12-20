@@ -30,10 +30,10 @@ def override_config_from_dict(input_values):
     if input_values["NUM_FRAMES_HEATMAP"] is not None:
         config.NUM_FRAMES_HEATMAP = input_values["NUM_FRAMES_HEATMAP"]
 
-    if input_values["HEATMAP_THRESHOLD_HIGH"] is not None:
-        config.HEATMAP_THRESHOLD_HIGH = input_values["HEATMAP_THRESHOLD_HIGH"]
-    if input_values["HEATMAP_THRESHOLD_LOW"] is not None:
-        config.HEATMAP_THRESHOLD_LOW = input_values["HEATMAP_THRESHOLD_LOW"]
+    if input_values["HEATMAP_THRESHOLD_FACTOR"] is not None:
+        config.HEATMAP_THRESHOLD_FACTOR = input_values["HEATMAP_THRESHOLD_FACTOR"]
+    if input_values["MIN_FRAMES"] is not None:
+        config.MIN_FRAMES = input_values["MIN_FRAMES"]
 
 override_config_from_dict({
     "INPUT_CHANNELS": ['hls_all'],
@@ -42,14 +42,14 @@ override_config_from_dict({
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4",
-    "NUM_FRAMES_HEATMAP": 55,
-    "HEATMAP_THRESHOLD_HIGH": 35,
-    "HEATMAP_THRESHOLD_LOW": 5
+    "NUM_FRAMES_HEATMAP": 75,
+    "HEATMAP_THRESHOLD_FACTOR": 0.9,
+    "MIN_FRAMES": 5
 })
 
 diagnostics_enabled = True
 regular_enabled = True
-trouble_1 = False
+trouble_1 = True
 output_images = True
 input_base = "project_video"
 
@@ -67,7 +67,7 @@ if trouble_1:
     count = 0
     clip1 = VideoFileClip(input_filename)
     clip = clip1.fl_image(
-        detector.process_image_with_diagnostics).subclip(35, 45)
+        detector.process_image_with_diagnostics).subclip(19, 25)
     clip.write_videofile(output_diag_filename_t1, audio=False)
 
 if regular_enabled:

@@ -35,23 +35,23 @@ def override_config_from_dict(input_values):
 
 configs = []
 
-# configs.append({
-#     "INPUT_CHANNELS": ['hls_s'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": False,
-#     "USE_COLOR_HIST": False,
-#     "RESULTS_FOLDER": "results/hls_s_no_extra_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['hls_s'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": False,
+    "USE_COLOR_HIST": False,
+    "RESULTS_FOLDER": "results/hls_s_no_extra_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['hls_all'],
-#     "HOG_CELLS_PER_BLOCK": (4, 4),
-#     "HOG_BLOCK_STEPS": 3,
-#     "USE_SPATIAL": True,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/hls_hls_spatial_color_4x4_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['hls_all'],
+    "HOG_CELLS_PER_BLOCK": (4, 4),
+    "HOG_BLOCK_STEPS": 3,
+    "USE_SPATIAL": True,
+    "USE_COLOR_HIST": True,
+    "RESULTS_FOLDER": "results/hls_hls_spatial_color_4x4_steps_4"
+})
 
 configs.append({
     "INPUT_CHANNELS": ['hls_all'],
@@ -62,96 +62,95 @@ configs.append({
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4"
 })
 
+configs.append({
+    "INPUT_CHANNELS": ['YCrCb_all'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": False,
+    "USE_COLOR_HIST": True,
+    "RESULTS_FOLDER": "results/YCrCb_all_color_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['YCrCb_all'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": False,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/YCrCb_all_color_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['luv_l'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": False,
+    "USE_COLOR_HIST": False,
+    "RESULTS_FOLDER": "results/luv_l_no_extra_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['luv_l'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": False,
-#     "USE_COLOR_HIST": False,
-#     "RESULTS_FOLDER": "results/luv_l_no_extra_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['luv_l'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": True,
+    "USE_COLOR_HIST": True,
+    "RESULTS_FOLDER": "results/luv_l_color_spatial_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['luv_l'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": True,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/luv_l_color_spatial_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['luv_u'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": True,
+    "USE_COLOR_HIST": True,
+    "RESULTS_FOLDER": "results/luv_u_color_spatial_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['luv_u'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": True,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/luv_u_color_spatial_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['luv_v'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": True,
+    "USE_COLOR_HIST": True,
+    "RESULTS_FOLDER": "results/luv_v_color_spatial_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['luv_v'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": True,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/luv_v_color_spatial_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['luv_l', 'luv_v'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": True,
+    "USE_COLOR_HIST": True,
+    "RESULTS_FOLDER": "results/luv_lv_color_spatial_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['luv_l', 'luv_v'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": True,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/luv_lv_color_spatial_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['yuv_all'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": False,
+    "USE_COLOR_HIST": False,
+    "RESULTS_FOLDER": "results/yuv_yuv_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['yuv_all'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": False,
-#     "USE_COLOR_HIST": False,
-#     "RESULTS_FOLDER": "results/yuv_yuv_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['yuv_u', 'yuv_v'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": False,
+    "USE_COLOR_HIST": False,
+    "RESULTS_FOLDER": "results/yuv_uv_3x3_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['yuv_u', 'yuv_v'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": False,
-#     "USE_COLOR_HIST": False,
-#     "RESULTS_FOLDER": "results/yuv_uv_3x3_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['yuv_all'],
+    "HOG_CELLS_PER_BLOCK": (2, 2),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": False,
+    "USE_COLOR_HIST": False,
+    "RESULTS_FOLDER": "results/yuv_yuv_2x2_steps_4"
+})
 
-# configs.append({
-#     "INPUT_CHANNELS": ['yuv_all'],
-#     "HOG_CELLS_PER_BLOCK": (2, 2),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": False,
-#     "USE_COLOR_HIST": False,
-#     "RESULTS_FOLDER": "results/yuv_yuv_2x2_steps_4"
-# })
-
-# configs.append({
-#     "INPUT_CHANNELS": ['yuv_all'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": True,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/yuv_yuv_3x3_color_spatial_steps_4"
-# })
+configs.append({
+    "INPUT_CHANNELS": ['yuv_all'],
+    "HOG_CELLS_PER_BLOCK": (3, 3),
+    "HOG_BLOCK_STEPS": 4,
+    "USE_SPATIAL": True,
+    "USE_COLOR_HIST": True,
+    "RESULTS_FOLDER": "results/yuv_yuv_3x3_color_spatial_steps_4"
+})
 
 for c in configs:
     override_config_from_dict(c)
