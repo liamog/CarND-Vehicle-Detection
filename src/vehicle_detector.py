@@ -1,12 +1,9 @@
-import math
 import pathlib
 
 import matplotlib.pyplot as pp
 import numpy as np
 import scipy.misc
-from scipy.ndimage.filters import maximum_filter
-from scipy.ndimage.measurements import find_objects, label
-from scipy.ndimage.morphology import binary_erosion, generate_binary_structure
+from scipy.ndimage.measurements import label
 
 import config
 import cv2
@@ -36,6 +33,8 @@ class VehicleDetector():
         self.bboxes = None
         if self.save_images_folder is not None:
             pathlib.Path(self.save_images_folder).mkdir(
+                parents=True, exist_ok=True)
+            pathlib.Path(self.save_images_folder + "/detections").mkdir(
                 parents=True, exist_ok=True)
 
     def build_heat_map(self):
@@ -204,6 +203,11 @@ class VehicleDetector():
 
         final_plus_diags = np.hstack((processed, diags_1))
         if self.save_images_folder is not None:
+            filename = "{}/detections/det_image_{}.jpg".format(
+                self.save_images_folder, self.count)
+            cv2.imwrite(filename, cv2.cvtColor(
+                det, cv2.COLOR_RGB2BGR))
+
             filename = "{}/diag_image_{}.jpg".format(
                 self.save_images_folder, self.count)
             cv2.imwrite(filename, cv2.cvtColor(

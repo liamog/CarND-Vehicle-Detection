@@ -39,19 +39,6 @@ def override_config_from_dict(input_values):
     if input_values["MIN_FRAMES"] is not None:
         config.MIN_FRAMES = input_values["MIN_FRAMES"]
 
-# override_config_from_dict({
-#     "INPUT_CHANNELS": ['hls_all'],
-#     "HOG_CELLS_PER_BLOCK": (3, 3),
-#     "HOG_BLOCK_STEPS": 4,
-#     "USE_SPATIAL": True,
-#     "USE_COLOR_HIST": True,
-#     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4",
-#     "NUM_FRAMES_HEATMAP": 50,
-#     "HEATMAP_THRESHOLD_FACTOR": 0.93,
-#     "MIN_FRAMES": 5
-# })
-
-
 override_config_from_dict({
     "INPUT_CHANNELS": ['hls_all'],
     "HOG_CELLS_PER_BLOCK": (4, 4),
