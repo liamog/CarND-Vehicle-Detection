@@ -107,13 +107,13 @@ class Classifier():
             scaled_x, y_full, test_size=0.2, random_state=rand_state)
 
         svr = svm.SVC()
-        gs = GridSearchCV(svr, config.PARAM_GRID, n_jobs=1)
-        gs.fit(x_train, y_train)
-        print(gs.cv_results_)
-        print(gs.best_estimator_)
-        joblib.dump(gs.cv_results_, self._parameter_search_results)
+        grid_search = GridSearchCV(svr, config.PARAM_GRID, n_jobs=1)
+        grid_search.fit(x_train, y_train)
+        print(grid_search.cv_results_)
+        print(grid_search.best_estimator_)
+        joblib.dump(grid_search.cv_results_, self._parameter_search_results)
 
-        self.clf = gs.best_estimator_
+        self.clf = grid_search.best_estimator_
 
         y_predict = self.clf.predict(x_test)
 
@@ -138,10 +138,9 @@ class Classifier():
             :param self:
             :param features:
         """
-        resized_image = scipy.misc.imresize(image, (64,64))
+        resized_image = scipy.misc.imresize(image, (64, 64))
         features = self.extract_img_features(resized_image)
         return self.predict(features)
-
 
     def extract_img_features(self, img):
         img_for_hog = pp.convert_img_for_hog(img)

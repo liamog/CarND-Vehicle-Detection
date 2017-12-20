@@ -1,3 +1,5 @@
+import cProfile
+
 import numpy as np
 import scipy
 import scipy.misc
@@ -7,7 +9,7 @@ from scipy.ndimage.interpolation import zoom
 import config
 import cv2
 from vehicle_detector import VehicleDetector
-import cProfile
+
 
 def override_config_from_dict(input_values):
     if input_values["INPUT_CHANNELS"] is not None:

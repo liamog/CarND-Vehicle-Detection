@@ -1,12 +1,13 @@
+import pickle
+
+import matplotlib.pyplot as plt
 import numpy as np
 from skimage.feature import hog
 
 import config
-import matplotlib.pyplot as plt
-import numpy as np
-import pickle
 import cv2
 import preprocess as pp
+
 
 class SlidingWindowHog():
 

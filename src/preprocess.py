@@ -6,6 +6,7 @@ from skimage.feature import hog
 import config
 import cv2
 
+
 def convert_img_for_hog(img_rgb):
     """
     Converts the image to the set of color channels specified in config.
@@ -70,7 +71,7 @@ def color_hist(img, nbins=16):
 def extract_other_features(img):
     retval = None
     if config.USE_SPATIAL:
-       retval = bin_spatial(img)
+        retval = bin_spatial(img)
     if config.USE_COLOR_HIST:
         colors = color_hist(img)
         if retval is not None:
@@ -210,4 +211,3 @@ def extract_regions_of_interest(img):
         row_start -= row_start_step
         row_end -= row_end_step
     return regions
-

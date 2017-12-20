@@ -4,9 +4,6 @@ import glob
 import os
 import pathlib
 
-import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
-
 import config
 import cv2
 from vehicle_detector import VehicleDetector
