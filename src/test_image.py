@@ -33,6 +33,15 @@ def override_config_from_dict(input_values):
     if input_values["RESULTS_FOLDER"] is not None:
         config.RESULTS_FOLDER = input_values["RESULTS_FOLDER"]
 
+    if input_values["NUM_FRAMES_HEATMAP"] is not None:
+        config.NUM_FRAMES_HEATMAP = input_values["NUM_FRAMES_HEATMAP"]
+
+    if input_values["HEATMAP_THRESHOLD_FACTOR"] is not None:
+        config.HEATMAP_THRESHOLD_FACTOR = input_values["HEATMAP_THRESHOLD_FACTOR"]
+
+    if input_values["MIN_FRAMES"] is not None:
+        config.MIN_FRAMES = input_values["MIN_FRAMES"]
+
 configs = []
 
 configs.append({
@@ -41,6 +50,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": False,
     "USE_COLOR_HIST": False,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/hls_s_no_extra_3x3_steps_4"
 })
 
@@ -50,6 +62,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 3,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_4x4_steps_4"
 })
 
@@ -59,8 +74,12 @@ configs.append({
     "HOG_BLOCK_STEPS": 2,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/hls_hls_spatial_color_3x3_steps_4"
 })
+
 
 configs.append({
     "INPUT_CHANNELS": ['YCrCb_all'],
@@ -68,6 +87,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": False,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/YCrCb_all_color_3x3_steps_4"
 })
 
@@ -77,6 +99,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": False,
     "USE_COLOR_HIST": False,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/luv_l_no_extra_3x3_steps_4"
 })
 
@@ -86,6 +111,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/luv_l_color_spatial_3x3_steps_4"
 })
 
@@ -95,6 +123,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/luv_u_color_spatial_3x3_steps_4"
 })
 
@@ -104,6 +135,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/luv_v_color_spatial_3x3_steps_4"
 })
 
@@ -113,6 +147,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/luv_lv_color_spatial_3x3_steps_4"
 })
 
@@ -122,6 +159,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": False,
     "USE_COLOR_HIST": False,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/yuv_yuv_3x3_steps_4"
 })
 
@@ -131,6 +171,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": False,
     "USE_COLOR_HIST": False,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/yuv_uv_3x3_steps_4"
 })
 
@@ -140,6 +183,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": False,
     "USE_COLOR_HIST": False,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/yuv_yuv_2x2_steps_4"
 })
 
@@ -149,6 +195,9 @@ configs.append({
     "HOG_BLOCK_STEPS": 4,
     "USE_SPATIAL": True,
     "USE_COLOR_HIST": True,
+    "NUM_FRAMES_HEATMAP": 1,
+    "HEATMAP_THRESHOLD_FACTOR": 1.0,
+    "MIN_FRAMES": 1,
     "RESULTS_FOLDER": "results/yuv_yuv_3x3_color_spatial_steps_4"
 })
 
